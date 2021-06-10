@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+
+<body>
+    <div id="bookInfo">
+        <input type="text" v-model="book.bookName"/>
+        <input type="text" v-model="book.price"/>
+        <input type="button" value="新增" v-on:click="addBook"/>
+        <input type="button" value="修改" v-on:click="updateBook"/>
+        <input type="button" value="批量删除" v-on:click="batchDelete"/>
+        <table border="1px" cellspacing="0" style="margin-top: 10px;">
+            <tr>
+                <th>选择</th>
+                <th>图书名</th>
+                <th>图书价格</th>
+                <th>操作</th>
+            </tr>
+            <tr v-for="book in books">
+                <td>
+                    <input type="checkbox" v-model="book.status"/>
+                </td>
+                <td>{{book.bookName}}</td>
+                <td>{{book.price}}</td>
+                <td>
+                    <input type="button" value="删除" v-on:click="deleteBook(book.id)" />
+                    <input type="button" value="修改" @click="findBook(book.id)" />
+                </td>
+            </tr>
+        </table>
+        <input type="button" value="全选" v-on:click="selectAll"/>
+        <input type="button" value="反选" v-on:click="notCheck"/>
+    </div>
+</body>
+
+<script src="vue.min.js"></script>
+<script>
+    new Vue({
+        el: "#bookInfo",
+        data() {
+            return {
+                books: [
+                    {id:1, bookName: "三国", price: 11 ,status: false},
+                    {id:2, bookName: "水浒", price: 22 ,status: false},
+                    {id:3, bookName: "西游", price: 33 ,status: false},
+                    {id:4, bookName: "红楼", price: 44 ,status: false},
+                ],
+                book: {},
+                start: 100,
+            }
+        },
+        methods: {
+            addBook(){
+                this.book.id=this.start++;
+                this.book.status=false;
+                this.books.push(this.book);
+                this.book={};
+            },
+            deleteBook(id){
+                this.books.splice(this.books.findIndex(x => x.id == id),1)
+            },
+            findBook(id){         
+                this.book = this.books[this.books.findIndex(x => x.id == id)]
+            },
+            updateBook(){
+                this.book={};
+            },
+            selectAll(){
+                this.books.forEach(x => {
+                    x.status = true;
+                });
+            },
+            notCheck(){
+                this.books.forEach(x => {
+                    x.status = !x.status;
+                });
+            },
+            batchDelete(){
+                for(var i=this.books.length-1;i>=0;i--){
+                    if(this.books[i].status == true){
+                        this.books.splice(i,1)
+                    }
+                }
+            }
+        },
+    })
+</script>
+
+</html>

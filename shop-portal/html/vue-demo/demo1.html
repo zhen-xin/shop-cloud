@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="vue.min.js"></script>
+<body>
+    <div id="info">
+        <select id="bookSelect">
+            <option value="-1">===请选择===</option>
+            <option v-for="book in books" :value="book.id">
+                {{book.name}}
+            </option>
+        </select>
+        <input type="text" v-model="msg">
+        {{msg}}
+        <ul v-for="book in books">
+            <li :value="book.id">{{book.name}}</li>
+        </ul>
+        <ul v-for="(x,y) in user">
+            {{y}}:{{x}}
+        </ul>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:"#info",
+        data:{
+            books:[{id:1,name:"西游记"},{id:2,name:"红楼梦"},{id:3,name:"水浒传"},{id:4,name:"三国演义"}],
+            msg:"万世祥",
+            user:{name:"万世祥",age:20,sex:"男"}
+        }
+    })
+</script>
+</html>

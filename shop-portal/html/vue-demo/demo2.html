@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="vue.min.js"></script>
+<body>
+    <div id="info">
+        姓名：<input type="text" v-model="userName">
+        年龄：<input type="text" v-model="userAge">
+        <input type="button" value="增加学生" v-on:click="addStu()">
+        <table border="1px" cellspacing="0" style="margin-top: 20px">
+            <tr>
+                <td>姓名</td>
+                <td>年龄</td>
+            </tr>
+            <tr v-for="stu in students">
+                <td>{{stu.name}}</td>
+                <td>{{stu.age}}</td>
+            </tr>
+        </table>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:"#info",
+        data:{
+            userName:"",
+            userAge:"",
+            students:[]
+        },
+        methods:{
+            addStu(){
+                let student={};
+                student.name=this.userName;
+                student.age=this.userAge;
+                this.students.push(student);
+                this.userName="";
+                this.userAge="";
+            }
+        }
+    })
+</script>
+</html>

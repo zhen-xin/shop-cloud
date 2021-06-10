@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <script src="../../js/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="../../js/jquery.cookie.min.js"></script>
+
+    <script src="../common/common.js"></script>
+    <title>账号未激活</title>
+</head>
+<body>
+    <h1>账号未激活，请点击激活！<a href="#" onclick="sendActivateMail2()">激活</a></h1>
+</body>
+<script>
+    function sendActivateMail() {
+        let data = $.cookie("data");
+        console.log(data);
+        $.ajax({
+            url:v_url+"api/member/sendActivateMail",
+            type:"post",
+            contentType:"application/json",
+            data:data,
+            success:function (res) {
+                if(res.code == 200){
+                    location.href = "../login.html"
+                }
+            }
+        })
+    }
+
+    function sendActivateMail2() {
+        let data = $.cookie("data");
+        console.log(data);
+        let evalData = eval("("+data+")");
+        console.log(evalData);
+        $.ajax({
+            url:v_url+"api/member/sendActivateMail2",
+            type:"post",
+            data:evalData,
+            success:function (res) {
+                if(res.code == 200){
+                    location.href = "../login.html"
+                }
+            }
+        })
+    }
+</script>
+</html>

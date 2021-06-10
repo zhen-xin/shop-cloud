@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="stylesheet" href="../js/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-cartPanelView.css" />
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/shop/js/pages/index.js"></script>
+    <script type="text/javascript" src="../js/jquery.cookie.min.js"></script>
+
+    <script src="common/common.js"></script>
+    <title>会员注册</title>
+</head>
+<body>
+    <h1 style="margin-left: 640px;margin-top: 70px;">会员登录</h1>
+    <form id="memberFrom" class="form-horizontal" style="margin-top: 20px">
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">会员名</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" name="memberName"  placeholder="会员名">
+            </div>
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">密码</label>
+            <div class="col-sm-3">
+                <input type="password" class="form-control" name="password" placeholder="密码">
+            </div>
+        </div>
+        <div class="form-group" style="margin-left: 100px">
+            <div class="col-sm-offset-4 col-sm-10">
+                <div class="btn-group" role="group" aria-label="..." style="margin-left: 25px">
+                    <button type="button" onclick="login()" class="btn btn-info"> 登录</button>
+                </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="reset"  onclick="register()" class="btn btn-danger"> 注册</button>
+                </div>
+                <a style="margin-left: 50px" href="retrieve.html">忘记密码</a>
+            </div>
+        </div>
+    </form>
+</body>
+<script>
+    function login() {
+        $.get(
+            "http://localhost:9000/member/api/member/login",
+            $("#memberFrom").serialize(),
+            function(res) {
+                if(res.code==200){
+                    //window.localStorage.setItem("x-auth",res.data);
+                    //将服务端响应客户端的信息存入会话cookie中
+                    $.cookie("token",res.data);
+                    location.href = "index.html";
+                }else if(res.code==1021){
+                    var data = JSON.stringify(res.data);
+                    $.cookie("data",data);
+                    location.href = "activate/send-activate-mail.html";
+                }else {
+                    alert(res.msg)
+                }
+            }
+        )
+    }
+
+    function register() {
+        location.href = "register.html";
+    }
+
+</script>
+</html>

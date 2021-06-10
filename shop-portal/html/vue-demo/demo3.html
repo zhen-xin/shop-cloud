@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script src="vue.min.js"></script>
+<body>
+    <div id="info">
+        图书名：<input type="text" v-model="bookName">
+        作者：<input type="text" v-model="bookAuto">
+        价格：<input type="text" v-model="bookPrice">
+        <input type="hidden" v-model="bookIndex">
+        <input type="button" value="新增图书" v-on:click="addBook()">
+        <input type="button" value="修改图书" v-on:click="updateBook()">
+        <input type="button" value="批量删除" v-on:click="delBatchBook()">
+
+        <table border="1px" cellspacing="0" style="margin-top: 20px">
+            <tr>
+                <td>图书名称</td>
+                <td>作者</td>
+                <td>价格</td>
+                <td>操作</td>
+            </tr>
+            <tr v-for="(book,index) in books">
+                <td>{{book.bookName}}</td>
+                <td>{{book.auto}}</td>
+                <td>{{book.price}}</td>
+                <td>
+                    <input type="button" value="删除" v-on:click="deleteBook(index)">
+                    <input type="button" value="修改" v-on:click="findBook(book,index)">
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+<script>
+    new Vue({
+        el:"#info",
+        data:{
+            bookName:"",
+            bookAuto:"",
+            bookPrice:"",
+            bookIndex:-1,
+            books:[{bookName:"小明自传",auto:"小明",price:22.5}]
+        },
+        methods:{
+            addBook(){
+                let book={};
+                book.bookName=this.bookName;
+                book.auto=this.bookAuto;
+                book.price=this.bookPrice;
+                this.books.push(book);
+                this.bookName="";
+                this.bookAuto="";
+                this.bookPrice="";
+            },
+            deleteBook(index){
+                this.books.splice(index,1);
+            },
+            delBatchBook(){
+                this.books=[];
+            },
+            findBook(book,index){
+                this.bookName=book.bookName;
+                this.bookAuto=book.auto;
+                this.bookPrice=book.price;
+                this.bookIndex=index;
+            },
+            updateBook(){
+                let i=this.bookIndex;
+                this.books[i].bookName=this.bookName;
+                this.books[i].auto=this.bookAuto;
+                this.books[i].price=this.bookPrice;
+            }
+        }
+    })
+</script>
+</html>

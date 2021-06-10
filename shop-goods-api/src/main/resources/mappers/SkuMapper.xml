@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+    "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.fh.shop.api.goods.mapper.ISkuMapper">
+    <select id="findRecommendNewProductList" resultType="com.fh.shop.api.goods.po.Sku">
+        SELECT sku.id,sku.skuName,sku.price,sku.image
+        FROM t_sku sku LEFT JOIN t_spu spu ON sku.spuId = spu.id
+        WHERE spu.ifGrounding = 1 and spu.ifNewProduct = 1 and spu.ifRecommend = 1
+    </select>
+
+    <select id="selectCronSku" resultType="com.fh.shop.api.goods.vo.CronSku" parameterType="int">
+        SELECT sku.id,sku.skuName,sku.price,sku.stock,spu.cateName,spu.brandName
+        FROM t_sku sku LEFT JOIN t_spu spu ON sku.spuId = spu.id
+        WHERE #{stockLimit} >= sku.stock
+    </select>
+
+    <update id="subtractStock">
+        update t_sku set stock = stock - #{count}
+        where id = #{skuId} and stock >= #{count} and ifGrounding = 1
+    </update>
+
+    <update id="returnStock">
+        update t_sku set stock = stock + #{count}
+        where id = #{skuId}
+    </update>
+
+    <update id="updateSalesVolume">
+        update t_sku set salesVolume = salesVolume + #{salesVolume}
+        where id = #{skuId}
+    </update>
+</mapper>

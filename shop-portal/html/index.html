@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="stylesheet" href="../js/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-cartPanelView.css" />
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/shop/js/pages/index.js"></script>
+    <script type="text/javascript" src="../js/jquery.cookie.min.js"></script>
+    <title>商城首页</title>
+
+    <script src="common/nav.js"></script>
+    <script src="common/common.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">飞狐商城</a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right" id="memberDiv">
+                <li><a href="login.html">登录</a></li>
+                <li><a href="register.html">注册</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="nav-bottom">
+    <!--顶部-->
+    <div class="nav-top">
+        <!--头部-->
+        <div class="header">
+            <div class="py-container">
+                <div class="yui3-g NavList">
+                    <div class="yui3-u Left all-sort">
+                        <h4>全部商品分类</h4>
+                    </div>
+                    <div class="yui3-u Center navArea">
+                        <ul class="nav">
+                            <li class="f-item">服装城</li>
+                            <li class="f-item">美妆馆</li>
+                            <li class="f-item">品优超市</li>
+                            <li class="f-item">全球购</li>
+                            <li class="f-item">闪购</li>
+                            <li class="f-item">团购</li>
+                            <li class="f-item">有趣</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--列表-->
+<div class="sort">
+    <div class="py-container">
+        <div class="yui3-g SortList ">
+            <div class="yui3-u Left all-sort-list">
+                <div class="all-sort-list2" id="cateHtml">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="row" >
+        <div class="col-md-12">
+            <div class="panel panel-success">
+                <div class="panel-heading">商品列表</div>
+                <div class="panel-body" id="productListDiv">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-md-12">
+            <div class="panel panel-success">
+                <div class="panel-heading">热销品牌</div>
+                <div class="panel-body" id="brandListDiv">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+<div id="skuDiv" style="display: none">
+    <div class="col-md-4">
+        <div class="thumbnail">
+            <img style="height: 300px" src="##image##">
+            <div class="caption">
+                <h3 style="color: red;">￥##price##</h3>
+                <p>##skuName##</p>
+                <p><a href="#" class="btn btn-primary" role="button">购买</a> <a href="#" class="btn btn-default" role="button" onclick="addCartItem('##skuId##')">加入购物车</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    $(function () {
+        findMember();
+        initCate();
+        initFindRecommendNewProductList();
+    });
+
+    function findMember() {
+        $.ajax({
+            url:v_url+"member/api/member/findRequestMember",
+            type:"get",
+            success:function (res) {
+                if(res.code == 200){
+                    $("#memberDiv").html('<li><a href="#">欢迎，'+res.data.memberVo.nickName+'</a></li><li><a href="#" onclick="loginOut()">注销</a></li><li><a href="update-password.html">修改密码</a></li><li><a href="cart.html">购物车('+res.data.totalCount+')</a></li>')
+                    //initCartTotalCount();
+                }
+            }
+        })
+    }
+
+    function loginOut() {
+        $.ajax({
+            url:v_url+"member/api/member/outLogin",
+            type:"get",
+            success:function (res) {
+                if(res.code == 200){
+                    $.removeCookie("token")
+                    location.href = "index.html";
+                }
+            }
+        })
+    }
+
+    function initCss() {
+        $('.all-sort-list2 > .item').hover(function() {
+            //父类分类列表容器的高度
+
+            $(this).addClass('hover');
+            $(this).children('.item-list').css('display', 'block');
+        }, function() {
+            $(this).removeClass('hover');
+            $(this).children('.item-list').css('display', 'none');
+        });
+
+        $('.item > .item-list > .close').click(function() {
+            $(this).parent().parent().removeClass('hover');
+            $(this).parent().hide();
+        });
+    }
+
+    function initCate() {
+        $.ajax({
+            url:v_url+"cate/api/cate/query",
+            type:"get",
+            //async: false,//同步
+            success: function (result) {
+                if (result.code==200){
+                    var cateList = result.data;
+                    console.log(cateList);
+                    for (var i = 0; i < cateList.length; i++) {
+                        var cateHtml = "";
+                        if (cateList[i].fatherId == 0) {
+                            cateHtml += "<div class=\"item\"><h3><a href=\"\">"+cateList[i].cateName+"</a></h3>" +
+                                "<div class=\"item-list clearfix\">\n" +
+                                "<div class=\"subitem\">"
+                            var count = 1;
+                            for (var j = 0; j < cateList.length; j++) {
+                                if (cateList[i].id == cateList[j].fatherId){
+                                    cateHtml += "<dl class=\"fore"+(count++)+"\">\n" +
+                                        "<dt><a href=\"\">"+cateList[j].cateName+"</a></dt><dd>\n"
+                                    for (var x = 0; x < cateList.length; x++) {
+                                        if (cateList[j].id == cateList[x].fatherId){
+                                            cateHtml += "<em><a href=\"\">"+cateList[x].cateName+"</a></em>";
+                                        }
+                                    }
+                                    cateHtml += "</dd></dl>"
+                                }
+                            }
+                        }
+                        cateHtml += "</div></div></div>";
+                        $("#cateHtml").append(cateHtml)
+                        initCss();
+                    }
+                }
+            }
+        })
+    }
+
+    function initFindRecommendNewProductList(){
+        $.ajax({
+            url:v_url+"goods/api/spu/findRecommendNewProductList",
+            type:"get",
+            success:function(res){
+                if(res.code == 200){
+                    var v_skuList = res.data;
+                    //var v_skuHtml = ""
+                    // for(let v_sku of v_skuList){
+                    //     v_skuHtml += '<div class="col-md-4">\n' +
+                    //         '                        <div class="thumbnail">\n' +
+                    //         '                            <img style="height: 300px" src="http://localhost:8081'+v_sku.image+'">\n' +
+                    //         '                            <div class="caption">\n' +
+                    //         '                                <h3 style="color: red">￥'+v_sku.price+'</h3>\n' +
+                    //         '                                <p>'+v_sku.skuName+'</p>\n' +
+                    //         '                                <p><a href="#" class="btn btn-primary" role="button">购买</a> <a href="#" class="btn btn-default" role="button">加入购物车</a></p>\n' +
+                    //         '                            </div>\n' +
+                    //         '                        </div>\n' +
+                    //         '                    </div>'
+                    // }
+                    // $("#productListDiv").html(v_skuHtml);
+                    for (let v_sku of v_skuList){
+                        var skuHtml = $("#skuDiv").html().replace(/##image##/,"https://wanshixiang.oss-cn-beijing.aliyuncs.com/"+v_sku.image)
+                            .replace(/##price##/g,v_sku.price)
+                            .replace(/##skuName##/g,v_sku.skuName)
+                            .replace(/##skuId##/g,v_sku.id);
+                        $("#productListDiv").append(skuHtml)
+                    }
+                }
+            }
+        })
+    }
+
+    function initCartTotalCount() {
+        $.ajax({
+            url:v_url+"cart/api/carts/findCartTotalCount",
+            type:"get",
+            success:function (res) {
+                if(res.code == 200){
+                    $("#memberDiv").append('<li><a href="cart.html">购物车('+res.data+')</a></li>')
+                }else if(res.code == 1203){
+                    $("#memberDiv").append('<li><a href="cart.html">购物车(0)</a></li>')
+                }
+            }
+        })
+    }
+
+    function addCartItem(skuId) {
+        $.ajax({
+            url:v_url+"cart/api/carts/addCartItem",
+            type:"post",
+            data:{
+                "skuId":skuId,
+                "count":1
+            },
+            success:function (res) {
+                if(res.code == 200){
+                    location.href = "cart.html";
+                }
+            }
+        })
+    }
+
+</script>
+</html>

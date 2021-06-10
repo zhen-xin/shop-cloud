@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="stylesheet" href="../js/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-cartPanelView.css" />
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/shop/js/pages/index.js"></script>
+    <script type="text/javascript" src="../js/jquery.cookie.min.js"></script>
+    <title>找回密码</title>
+
+    <script src="common/common.js"></script>
+</head>
+<body>
+    <h1 style="margin-left: 640px;margin-top: 70px;">找回密码</h1>
+    <form id="memberFrom" class="form-horizontal" style="margin-top: 20px">
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">邮箱</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" onblur="checkMail(this.value)" id="mail" placeholder="邮箱">
+                <div id="mailDiv"></div>
+            </div>
+            <div class="col-sm-1">
+                <button type="button" id="sendMailBut" onclick="sendMail()" class="btn btn-info"> 发送验证码</button>
+            </div>
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">验证码</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" onblur="checkCode(this.value)" id="code" placeholder="验证码">
+                <div id="codeDiv"></div>
+            </div>
+        </div>
+        <div class="form-group" style="margin-left: 180px">
+            <div class="col-sm-offset-4 col-sm-10">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" disabled="disabled" onclick="nextStep()" id="retrieveButton" class="btn btn-info"> 下一步</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div style="display: none" id="passwordDiv"  class="form-horizontal">
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">密码</label>
+            <div class="col-sm-3">
+                <input type="password" class="form-control" id="password" placeholder="密码">
+            </div>
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">确认密码</label>
+            <div class="col-sm-3">
+                <input type="password" class="form-control" id="confirmPassword" placeholder="确认密码">
+                <div id="confirmPasswordDiv"></div>
+            </div>
+        </div>
+        <div class="form-group" style="margin-left: 180px">
+            <div class="col-sm-offset-4 col-sm-10">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" onclick="retrievePassword()" class="btn btn-info"> 确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var v_id = "";
+    function nextStep() {
+        var code = $("#code").val();
+        if(code.length == 0){
+            $("#codeDiv").html("<span style=\"color: red\"><b>请输入验证码</b></span>")
+            return;
+        }
+        $.get(
+            v_url+"api/member/checkMailCode",
+            {
+                "id":v_id,
+                "code":code
+            },
+            function(res) {
+                if(res.code==200){
+                    $("#memberFrom").css("display","none");
+                    $("#passwordDiv").css("display","");
+                }else {
+                    $("#codeDiv").html("<span style=\"color: red\"><b>"+res.msg+"</b></span>")
+                }
+            }
+        )
+    }
+
+    function retrievePassword() {
+        if($("#confirmPassword").val() != $("#password").val()){
+            $("#confirmPasswordDiv").html("<span style=\"color: red\"><b>两次密码输入不一致</b></span>")
+        }
+        $("#confirmPasswordDiv").html("");
+        var v_param = {};
+        v_param.id = v_id;
+        v_param.mail = $("#mail").val();
+        v_param.confirmPassword = $("#confirmPassword").val();
+        v_param.password = $("#password").val();
+        v_param.code = $("#code").val();
+        $.post(
+            v_url+"api/member/retrievePassword",
+            v_param,
+            function(res) {
+                if(res.code==200){
+                    location.href = "login.html";
+                }else {
+                    alert(res.msg)
+                }
+            }
+        )
+    }
+
+    var v_count = 61;
+    function setTime() {
+        v_count--;
+        if(v_count == 0){
+            //还原
+            $("#sendMailBut").text("发送验证码");
+            $("#sendMailBut").removeAttr("disabled","disabled");//将按钮可用
+            v_count = 61;
+            return;
+        }
+        $("#sendMailBut").text("重新发送" + "(" + v_count + ")");
+        setTimeout(function () {
+            setTime();
+        }, 1000 );
+    }
+
+    function sendMail() {
+        if($("#mail").val().length == 0){
+            $("#mailDiv").html("<span style=\"color: red\"><b>请输入邮箱</b></span>");
+            return;
+        }
+        $("#sendMailBut").attr({"disabled":"disabled"});//控制按钮为禁用
+        setTime();
+        var mail = $("#mail").val();
+        $.get(
+            v_url+"api/mail/sendMail",
+            {"mail":mail},
+            function(res) {
+                if(res.code==200){
+                    v_id = res.data;
+                }else {
+                    alert(res.msg)
+                }
+            }
+        )
+    }
+
+    function checkMail(mail) {
+        $.ajax({
+            url:v_url+"api/member/checkMail",
+            type:"get",
+            data:{
+                "mail":mail
+            },
+            success:function (res) {
+                if(res.code == 1016){
+                    $("#mailDiv").html("<span style=\"color: green\"><b>邮箱正确</b></span>")
+                    $("#retrieveButton").removeAttr("disabled");
+                    $("#sendMailBut").removeAttr("disabled");
+                }else {
+                    $("#mailDiv").html("<span style=\"color: red\"><b>邮箱不合法</b></span>")
+                    $("#retrieveButton").attr("disabled","disabled");
+                    $("#sendMailBut").attr({"disabled":"disabled"});
+                }
+            }
+        })
+    }
+
+    function checkCode(val){
+        if(val.length == 0){
+            $("#codeDiv").html("<span style=\"color: red\"><b>请输入验证码</b></span>")
+        }else {
+            $("#codeDiv").html("")
+        }
+    }
+</script>
+</html>

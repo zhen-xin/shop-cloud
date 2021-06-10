@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+
+    <link rel="stylesheet" href="../js/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/webbase.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/pages-JD-index.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-jquery.autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="../js/shop/css/widget-cartPanelView.css" />
+    <script src="../js/jquery-3.3.1.js"></script>
+    <script src="../js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="../js/shop/js/pages/index.js"></script>
+    <script type="text/javascript" src="../js/jquery.cookie.min.js"></script>
+    <title>找回密码</title>
+
+    <script src="common/common.js"></script>
+</head>
+<body>
+    <h1 style="margin-left: 640px;margin-top: 70px;">找回密码</h1>
+    <form id="memberFrom" class="form-horizontal" style="margin-top: 20px">
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">邮箱</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="mail" placeholder="邮箱">
+            </div>
+        </div>
+        <div class="col-sm-2"></div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">验证码</label>
+            <div class="col-sm-3">
+                <div class="input-group">
+                    <input  style="width: 255px" id="code" type="text" class="form-control" placeholder="验证码">
+                    <span style="height: 35px;width: 110px" class="input-group-btn" id="imageCodeDiv">
+
+                    </span>
+                </div>
+            </div>
+            <div style="margin-top: 9px">
+                <a href="#" onclick="initImageCode()">看不清，换一张</a>
+            </div>
+        </div>
+        <div class="form-group" style="margin-left: 180px">
+            <div class="col-sm-offset-4 col-sm-10">
+                <div class="btn-group" role="group" aria-label="...">
+                    <button type="button" onclick="updatePassword()" class="btn btn-info"> 发送</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</body>
+<script>
+    $(function () {
+        initImageCode();
+    });
+
+    function initImageCode() {
+        let v_id = $.cookie("codeId");
+        $.ajax({
+            url:v_url+"api/MailCode",
+            type:"get",
+            data:{"id":v_id},
+            success:function (res) {
+                if(res.code == 200){
+                    var data = res.data;
+                    $("#imageCodeDiv").html('<img src="data:image/jpg;base64,'+data.imageBase64+'">')
+                    $.cookie("codeId",data.id)
+                }else {
+                    alert(res.msg)
+                }
+            }
+        })
+    }
+
+    function updatePassword() {
+        var v_param = {};
+        v_param.id = $.cookie("codeId");
+        v_param.mail = $("#mail").val();
+        v_param.code = $("#code").val();
+        $.post(
+            v_url+"api/member/mailUpdatePassword",
+            v_param,
+            function(res) {
+                if(res.code==200){
+                    location.href = "login.html";
+                }else {
+                    alert(res.msg)
+                }
+            }
+        )
+    }
+
+</script>
+</html>
