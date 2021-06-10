@@ -9,6 +9,7 @@ import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 public class EurekaServerRun {
 
     public static void main(String[] args) {
+        System.out.println("拉取后更改");
         SpringApplication.run(EurekaServerRun.class, args);
     }
 
